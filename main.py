@@ -29,7 +29,7 @@ def update_input():
     """
 
     response = ""
-    for value in ["project", "region", "service", "repo", "branch"]:
+    for value in ["project", "projectnum", "region", "service", "repo", "branch"]:
         if value in request.form:
             data = request.form[value]
             for i in range(10):

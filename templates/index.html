@@ -13,17 +13,22 @@
     padding: 10px;
     height: 200px;
   }
-  pre, textarea {
+
+  pre,
+  textarea {
     border: 1px solid black;
     padding: 10px;
     width: 60%;
   }
+
   .question {
     padding: 10px;
-   display:block;
+    display: block;
   }
+
   .help {
     font-style: italic;
+    font-size: 80%;
   }
 </style>
 
@@ -37,41 +42,46 @@
     <div class="question">
       <label>Project ID</label>
       <input type="text" name="project" hx-post="/input" hx-trigger="change"
-        hx-swap="multi:#project1,#project2,#project6,#project7">
+        hx-swap="multi:#project0,#project1,#project2,#project6,#project7">
       <div class="help">Requires a Google Cloud project (LINK)</div>
     </div>
+
+    <div class="question">
+      <label>Project Number</label>
+      <input type="text" name="projectnum" hx-post="/input" hx-trigger="change" hx-swap="multi:#projectnum0">
+      <div class="help">Get this by running
+        <code>gcloud projects describe <span id="project0">PROJECT_ID</span> --format="value(projectNumber)"</code>
+      </div>
+    </div>
+
     <div class="question">
       <label>Region</label>
-      <input type="text" name="region" hx-post="/input" hx-trigger="change"
-      hx-swap="multi:#region8,#region9">
+      <input type="text" name="region" hx-post="/input" hx-trigger="change" hx-swap="multi:#region8,#region9">
       <div class="help">Where do you want to deploy your service?</div>
     </div>
 
     <div class="question">
       <label>Service Name</label>
-      <input type="text" name="service" hx-post="/input" hx-trigger="change"
-      hx-swap="multi:#service8,#service9">
+      <input type="text" name="service" hx-post="/input" hx-trigger="change" hx-swap="multi:#service8,#service9">
       <div class="help">What should your service be called?</div>
     </div>
 
     <div class="question">
       <label>GitHub repo</label>
-      <input type="text" name="repo" hx-post="/input" hx-trigger="change"
-      hx-swap="multi:#repo2,#repo0">
+      <input type="text" name="repo" hx-post="/input" hx-trigger="change" hx-swap="multi:#repo2,#repo0">
       <div class="help">Use either UserName/Repo or Organisation/Repo</div>
     </div>
 
     <div class="question">
       <label>Default branch</label>
-      <input type="text" name="branch" hx-post="/input" hx-trigger="change"
-      hx-swap="multi:#branch1">
+      <input type="text" name="branch" hx-post="/input" hx-trigger="change" hx-swap="multi:#branch1">
       <div class="help">"master", "main", "latest", etc. </div>
     </div>
 
     <div class="question">
       <label>Allow unauthenticated invocations</label>
       <input type="checkbox" value="true" name="public" hx-get="/public" hx-trigger="change"
-      hx-swap="multi:#public-flag,#public-iam">
+        hx-swap="multi:#public-flag,#public-iam">
       <div class="help">Do you you want anyone to be able to open your website?</div>
     </div>
 
@@ -93,122 +103,7 @@ gcloud services enable \
             document.execCommand('copy');
             document.querySelector("#copyterraform").innerHTML = "Copied!"
           }</script>
-        <textarea id="terraform" readonly>
-# Set up provider
-terraform {
-  required_providers {
-    google = {
-      source = "hashicorp/google"
-    }
-  }
-}
-
-# Get variables
-variable "project_id" {
-  type = string
-}
-
-variable "github_repo" {
-  type        = string
-  description = "GitHub repo, in the form 'user/repo' or 'org/repo'"
-}
-
-variable "service_account" {
-  type        = string
-  description = "Service account name"
-  default     = "my-service-account"
-}
-
-variable "pool_id" {
-  type        = string
-  description = "Workload Identity Pool name"
-  default     = "example-pool"
-}
-
-variable "provider_id" {
-  type        = string
-  description = "Workload Identity Provider name"
-  default     = "example-gh-provider"
-}
-
-# Useful values for later
-provider "google" {
-  project = var.project_id
-}
-
-data "google_project" "project" {
-  project_id = var.project_id
-}
-
-# Enable multiple services
-locals {
-  services = [
-    "run.googleapis.com",
-    "iam.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "iamcredentials.googleapis.com",
-    "sts.googleapis.com",
-    "cloudbuild.googleapis.com",
-    "artifactregistry.googleapis.com"
-  ]
-}
-resource "google_project_service" "enabled" {
-  for_each                   = toset(local.services)
-  project                    = var.project_id
-  service                    = each.value
-  disable_dependent_services = true
-  disable_on_destroy         = false
-}
-
-# Create service account with permissions
-resource "google_service_account" "sa" {
-  account_id = var.service_account
-  depends_on = [google_project_service.enabled]
-}
-
-# Ensure both Cloud Build and custom SA have builder role
-resource "google_project_iam_binding" "cloudbuild_permissions" {
-  project = var.project_id
-  role    = "roles/cloudbuild.builds.builder"
-  members = ["serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com",
-  "serviceAccount:${google_service_account.sa.email}"]
-}
-
-# Assign permissions to service account
-resource "google_project_iam_binding" "service_permissions" {
-  for_each   = toset(["roles/run.developer", "roles/iam.serviceAccountUser", "roles/artifactregistry.admin"])
-  project    = var.project_id
-  role       = each.value
-  members    = ["serviceAccount:${google_service_account.sa.email}"]
-  depends_on = [google_service_account.sa]
-}
-
-# Use https://github.com/terraform-google-modules/terraform-google-github-actions-runners/tree/master/modules/gh-oidc
-module "gh_oidc" {
-  source      = "terraform-google-modules/github-actions-runners/google//modules/gh-oidc"
-  project_id  = var.project_id
-  pool_id     = var.pool_id
-  provider_id = var.provider_id
-  sa_mapping = {
-    (google_service_account.sa.account_id) = {
-      sa_name   = "projects/${var.project_id}/serviceAccounts/${google_service_account.sa.email}"
-      attribute = "attribute.repository/${var.github_repo}"
-    }
-  }
-
-  depends_on = [google_project_service.enabled, google_service_account.sa]
-}
-
-output "step" {
-  value = <<EOF
-    - id: 'auth'
-      uses: 'google-github-actions/auth@v0'
-      with:
-        workload_identity_provider: '${module.gh_oidc.provider_name}'
-        service_account: '${google_service_account.sa.email}'
-  EOF
-}
-</textarea>
+        <textarea id="terraform" readonly>{% include "_terraform.tf" %}</textarea>
 
       <li>Execute the code: </li>
       <pre><code>terraform init
@@ -221,50 +116,19 @@ terraform apply \
 
       <li>Add this file to your repo at <code>.github/workflows/deploy.yaml</code></li>
 
-      <pre><code>
-name: source_deploy
+      <pre><code>{%include "_githubaction.yaml" %}</code></pre>
 
-on:
-push:
-  branches:
-    - <span id="branch1">...</span>
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - id: auth
-      uses: google-github-actions/auth@v0
-      with:
-        workload_identity_provider: projects/<span id="project6">...</span>/locations/global/workloadIdentityPools/example-pool/providers/example-gh-provider
-        service_account: my-service-account@<span id="project7">...</span>.iam.gserviceaccount.com
-
-    - name: Deploy to Cloud Run
-      uses: google-github-actions/deploy-cloudrun@v0
-      with:
-        source: '.'
-        region: <span id="region9">...</span>
-        service: <span id="service9">...</span>
-    </code></pre>
-
-    <span id="public-iam"><b>Optional: </b></span>To make the service public:
-    <pre><code>gcloud run services add-iam-policy-binding <span id="service8">...</span> \
+      <span id="public-iam"><b>Optional: </b></span>To make the service public:
+      <pre><code>gcloud run services add-iam-policy-binding <span id="service8">...</span> \
   --region <span id="region8">...</span> \
   --member allUsers --role roles/run.invoker</code></pre>
 
-    <hr>
-    <h1>One-time deployment</h1>
+      <hr>
+      <h1>One-time deployment</h1>
 
-    If you have your GitHub repo cloned locally, you can just run this:
-    <pre><code>
-      cd /path/to/<span id="repo0">repo</span>
-      gcloud run deploy <span id="service0">myservice</span> <span id="public-flag"></span>
+      If you have your GitHub repo cloned locally, you can just run this:
+      <pre><code>cd /path/to/<span id="repo0">repo</span>
+gcloud run deploy <span id="service0">myservice</span> <span id="public-flag"></span>
     </code></pre>
 
 </body>
