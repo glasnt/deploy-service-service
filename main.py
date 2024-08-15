@@ -34,7 +34,6 @@ def update_input():
             data = request.form[value]
             for i in range(10):
                 response += f"<span id='{value}{i}'>{data}</span>"
-    print(response)
     return response
 
 @app.get("/")
