@@ -24,12 +24,13 @@ def public():
 @app.post("/input")
 def update_input():
     """ Multi-glob. (Warning: gnarly.)
+
     Using the multi-swap extension, we can update multiple "(value)N" fields.
     Presumes at most 10 numbered fields, in the form "[field]N".
     """
 
     response = ""
-    for value in ["project", "projectnum", "region", "service", "repo", "branch"]:
+    for value in ["project", "projectnum", "region", "service", "repo", "branch", "serviceaccount", "pool", "provider"]:
         if value in request.form:
             data = request.form[value]
             for i in range(10):

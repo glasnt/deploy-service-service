@@ -5,32 +5,8 @@
   <script src="https://unpkg.com/htmx.org@2.0.2"></script>
   <!--- Extension for swapping multiple fields at once -->
   <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/multi-swap.js"></script>
-
+  <style>{% include "_style.css" %}</style>
 </head>
-<style>
-  #terraform {
-    width: 60%;
-    padding: 10px;
-    height: 200px;
-  }
-
-  pre,
-  textarea {
-    border: 1px solid black;
-    padding: 10px;
-    width: 60%;
-  }
-
-  .question {
-    padding: 10px;
-    display: block;
-  }
-
-  .help {
-    font-style: italic;
-    font-size: 80%;
-  }
-</style>
 
 <body hx-ext="multi-swap">
 
@@ -39,17 +15,20 @@
   <div id="inputs">
     <h2>Customisation</h2>
 
+    <table><tr><td>
     <div class="question">
       <label>Project ID</label>
       <input type="text" name="project" hx-post="/input" hx-trigger="change"
         hx-swap="multi:#project0,#project1,#project2,#project6,#project7">
-      <div class="help">Requires a Google Cloud project (LINK)</div>
+      <div class="help">Requires a <a
+          href="https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project">Google
+          Cloud project</a></div>
     </div>
 
     <div class="question">
       <label>Project Number</label>
       <input type="text" name="projectnum" hx-post="/input" hx-trigger="change" hx-swap="multi:#projectnum0">
-      <div class="help">Get this by running
+      <div class="help">Get this by running:
         <code>gcloud projects describe <span id="project0">PROJECT_ID</span> --format="value(projectNumber)"</code>
       </div>
     </div>
@@ -57,46 +36,74 @@
     <div class="question">
       <label>Region</label>
       <input type="text" name="region" hx-post="/input" hx-trigger="change" hx-swap="multi:#region8,#region9">
-      <div class="help">Where do you want to deploy your service?</div>
+      <div class="help">Where do you want to deploy your service? Choose a <a
+          href="https://cloud.google.com/run/docs/locations">Cloud Run location</a></div>
     </div>
 
     <div class="question">
       <label>Service Name</label>
-      <input type="text" name="service" hx-post="/input" hx-trigger="change" hx-swap="multi:#service8,#service9">
-      <div class="help">What should your service be called?</div>
+      <input type="text" name="service" hx-post="/input" hx-trigger="change"
+      hx-swap="multi:#service7,#service8,#service9">
+      <div class="help">What should your service be called? (Must be a valid (LINK) name.)</div>
     </div>
 
     <div class="question">
       <label>GitHub repo</label>
       <input type="text" name="repo" hx-post="/input" hx-trigger="change" hx-swap="multi:#repo2,#repo0">
-      <div class="help">Use either UserName/Repo or Organisation/Repo</div>
+      <div class="help">Use either UserName/Repo or Organisation/Repo (don't include the "github.com")</div>
     </div>
 
     <div class="question">
       <label>Default branch</label>
-      <input type="text" name="branch" hx-post="/input" hx-trigger="change" hx-swap="multi:#branch1">
-      <div class="help">"master", "main", "latest", etc. </div>
+      <input type="text" name="branch" hx-post="/input" hx-trigger="change"
+      hx-swap="multi:#branch1,#branch2">
+      <div class="help">It's probably "main", "latest", etc. </div>
     </div>
 
     <div class="question">
       <label>Allow unauthenticated invocations</label>
       <input type="checkbox" value="true" name="public" hx-get="/public" hx-trigger="change"
         hx-swap="multi:#public-flag,#public-iam">
-      <div class="help">Do you you want anyone to be able to open your website?</div>
+      <div class="help">Do you you want <i>anyone</i> to be able to open your website?</div>
     </div>
+  </td>
+  <td><td>
+    <i>Optional</i>
+    <div class="question">
+      <label>Service account name</label>
+      <input type="text" name="serviceaccount"  name="serviceaccount" hx-post="/input" hx-trigger="change"
+        hx-swap="multi:#serviceaccount1,#serviceaccount2" value="my-service-account">
+      <div class="help">Name of the service account to create</div>
+    </div>
+    <div class="question">
+      <label>Workload Identity Pool id</label>
+      <input type="text" name="pool"  name="serviceaccount" hx-post="/input" hx-trigger="change"
+        hx-swap="multi:#pool1,#pool2" value="example-pool">
+      <div class="help">Name of the Workload Identity Pool</div>
+    </div>
+    <div class="question">
+      <label>Workload Identity Provider ID</label>
+      <input type="text" name="provider"  name="serviceaccount" hx-post="/input" hx-trigger="change"
+        hx-swap="multi:#provider1,#provider2" value="example-gh-provider">
+      <div class="help">Name of the Workload Identity Provider</div>
+    </div>
+
+  </td></tr></table>
 
     <h1>Source control based deployments</h1>
 
     <div id="output">
       <h2>Run this setup</h2>
-      <li>Run these setup steps to prepare your project</li>
-      <pre><code>gcloud config set project <span id="project1">...</span>
-gcloud services enable \
+      Run these setup steps to prepare your project. Don't have <code>gcloud</code>? Use <a
+          href="https://cloud.google.com/shell">Cloud Shell</a>
+      <pre class="shell"><code>
+<li>gcloud config set project <span id="project1">PROJECT_ID</span></li>
+<li>gcloud services enable \
     cloudresourcemanager.googleapis.com \
-    cloudbuild.googleapis.com    </code></pre>
+    cloudbuild.googleapis.com</li></code></pre>
 
       <h2>Apply this Terraform</h2>
-      <li>Copy this code into a <code>main.tf</code> file.
+      Copy this code into a <code>main.tf</code> file.
         <button id="copyterraform">Copy to clipboard</button><br>
         <script>document.querySelector("#copyterraform").onclick = function () {
             document.querySelector("#terraform").select();
@@ -104,33 +111,43 @@ gcloud services enable \
             document.querySelector("#copyterraform").innerHTML = "Copied!"
           }</script>
         <textarea id="terraform" readonly>{% include "_terraform.tf" %}</textarea>
-
-      <li>Execute the code: </li>
-      <pre><code>terraform init
-terraform apply \
-  -var project_id=<span id="project2">...</span> \
-  -var github_repo=<span id="repo2">...</span>
-  </code></pre>
+      <br><br>
+      Execute the code:
+      <pre class="shell"><code><li>terraform init</li>
+<li>terraform apply \
+    -var project_id=<span id="project2">PROJECT</span> \
+    -var github_repo=<span id="repo2">GITHUB_REPO</span> \
+    -var service_account=<span id="serviceaccount2">my-service-account</span> \
+    -var pool_id=<span id="pool2">example-pool</span> \
+    -var provider_id=<span id="provider2">example-gh-provider</span>
+</li>
+</code></pre>
 
       <h2>Create this GitHub Action</h2>
 
-      <li>Add this file to your repo at <code>.github/workflows/deploy.yaml</code></li>
+      Add this file to your repo at <code>.github/workflows/deploy.yaml</code>:
 
       <pre><code>{%include "_githubaction.yaml" %}</code></pre>
 
+      Once you commit this file, this action will run and deploy your service.
+
       <span id="public-iam"><b>Optional: </b></span>To make the service public:
-      <pre><code>gcloud run services add-iam-policy-binding <span id="service8">...</span> \
-  --region <span id="region8">...</span> \
-  --member allUsers --role roles/run.invoker</code></pre>
+      <pre class="shell"><code><li>gcloud run services add-iam-policy-binding <span id="service8">SERVICE</span> \
+    --region <span id="region8">REGION</span> \
+    --member allUsers --role roles/run.invoker</li></code></pre>
+
+      Now, any time you push to the <span id="branch2">BRANCH</span> branch, a new version of <span id="service7">SERVICE</span> service will be deployed.
 
       <hr>
       <h1>One-time deployment</h1>
 
-      If you have your GitHub repo cloned locally, you can just run this:
-      <pre><code>cd /path/to/<span id="repo0">repo</span>
-gcloud run deploy <span id="service0">myservice</span> <span id="public-flag"></span>
-    </code></pre>
+      If you have your GitHub repo cloned locally, you can just run this and follow the prompts:
+      <pre class="shell"><code><li>cd /path/to/<span id="repo0">repo</span></li>
+<li>gcloud run deploy <span id="service0">SERVICE</span> <span id="public-flag"></span></li></code></pre>
 
+    <H2>Learn more</H2>
+    <li><a href="https://github.com/google-github-actions/deploy-cloudrun">deploy-cloudrun GitHub Action</a></li>
+    <li><a href="https://cloud.google.com/iam/docs/best-practices-for-using-workload-identity-federation">Workload Identity best practices</a></li>
 </body>
 
 </html>
