@@ -37,13 +37,13 @@
     <div class="question">
       <label>Project ID</label>
       <input type="text" name="project" hx-post="/input" hx-trigger="change"
-        hx-swap="multi:#project1,#project2">
+        hx-swap="multi:#project1,#project2,#project6,#project7">
       <div class="help">Requires a Google Cloud project (LINK)</div>
     </div>
     <div class="question">
       <label>Region</label>
       <input type="text" name="region" hx-post="/input" hx-trigger="change"
-      hx-swap="multi:#region9">
+      hx-swap="multi:#region8,#region9">
       <div class="help">Where do you want to deploy your service?</div>
     </div>
 
@@ -217,8 +217,6 @@ terraform apply \
   -var github_repo=<span id="repo2">...</span>
   </code></pre>
 
-      <li>There will be output from this Terraform. Copy it for later. </li>
-
       <h2>Create this GitHub Action</h2>
 
       <li>Add this file to your repo at <code>.github/workflows/deploy.yaml</code></li>
@@ -232,23 +230,27 @@ push:
     - <span id="branch1">...</span>
 
 jobs:
-deploy:
-  runs-on: ubuntu-latest
-  permissions:
-    contents: read
-    id-token: write
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
-  steps:
-  - uses: actions/checkout@v4
+    steps:
+    - uses: actions/checkout@v4
 
-  # auth step: insert output from Terraform
+    - id: auth
+      uses: google-github-actions/auth@v0
+      with:
+        workload_identity_provider: projects/<span id="project6">...</span>/locations/global/workloadIdentityPools/example-pool/providers/example-gh-provider
+        service_account: my-service-account@<span id="project7">...</span>.iam.gserviceaccount.com
 
-  - name: Deploy to Cloud Run
-    uses: google-github-actions/deploy-cloudrun@v0
-    with:
-      source: '.'
-      region: <span id="region9">...</span>
-      service: <span id="service9">...</span>
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v0
+      with:
+        source: '.'
+        region: <span id="region9">...</span>
+        service: <span id="service9">...</span>
     </code></pre>
 
     <span id="public-iam"><b>Optional: </b></span>To make the service public:
