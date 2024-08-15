@@ -1,5 +1,37 @@
-<script src="https://unpkg.com/htmx.org@2.0.2"></script>
-<!-- have a button POST a click via AJAX -->
-<button hx-post="/clicked" hx-swap="outerHTML">
-  Click Me
-</button>
+<html>
+
+<head>
+  <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/multi-swap.js"></script>
+
+</head>
+
+<body hx-ext="multi-swap">
+
+  <div id="inputs">
+    <h2>Customisation</h2>
+
+    <label>Project ID</label>
+    <input type="text" name="project" hx-post="/input" hx-trigger="change"
+      hx-swap="multi:#project1,#project2,#project3"><br>
+
+    <label>Region</label>
+    <input type="text" name="region" hx-post="/input" hx-trigger="change"
+      hx-target="#region1"><br>
+
+    <input type="checkbox" value="true" name="public" hx-get="/public" hx-trigger="change"
+    hx-target="#public">
+      Allow unauthenticated invocations</checkbox>
+  </div>
+  <div id="output">
+    <h2>Scripts to run</h2>
+    <code>
+        gcloud foo bar --project <span id="project2">...</span> --region <span id="region1">...</span><br>
+        gcloud foo bar --project <span id="project3">...</span><br>
+        <span id="public"></code>
+
+  </div>
+
+</body>
+
+</html>
