@@ -1,6 +1,8 @@
+![deploy](https://github.com/glasnt/deploy-service-service/actions/workflows/deploy.yaml/badge.svg)
+
 # "Deploy service" service
 
-Very alpha, if it break, you get to keep all the shiny pieces. 
+Very alpha, if it breaks, you get to keep all the shiny pieces. 
 
 Assistant web app to help you setup a web app. 
 
