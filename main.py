@@ -12,9 +12,14 @@ def clicked():
 def public():
     """IAM Code to make a service public. """
     if "public" in request.args:
-        return "public"
+        return """
+            <span id="public-flag">--allow-unauthenticated</span>
+            <span id="public-iam"></span>
+            """
     else:
-        return ""
+        return """
+            <span id="public-iam"><b>Optional</b>: </span>"
+            """
 
 @app.post("/input")
 def update_input():
@@ -22,17 +27,20 @@ def update_input():
     Using the multi-swap extension, we can update multiple "(value)N" fields.
     Presumes at most 10 numbered fields, in the form "[field]N".
     """
-    for value in ["project", "region"]:
+
+    response = ""
+    for value in ["project", "region", "service", "repo", "branch"]:
         if value in request.form:
             data = request.form[value]
-            response = ""
             for i in range(10):
                 response += f"<span id='{value}{i}'>{data}</span>"
-            return response
+    print(response)
+    return response
 
 @app.get("/")
 def home():
     return render_template("index.html")
+
 
 
 
