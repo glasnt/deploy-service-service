@@ -1,3 +1,5 @@
+# This configuration was generated from the service itself!
+
 name: source_deploy
 
 on:
