@@ -1,0 +1,29 @@
+name: source_deploy
+
+on:
+  push:
+    branches:
+      - latest
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/1068624597505/locations/global/workloadIdentityPools/gh-pool/providers/gh-provider
+          service_account: gh-account@glasnt-apps.iam.gserviceaccount.com
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          source: .
+          region: australia-southeast2
+          service: deployservice
