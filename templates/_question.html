@@ -1,0 +1,7 @@
+<div class="question">
+    <label>{{label}}</label>
+    <input type="text" name="{{variable}}" hx-post="/input" hx-trigger="change"
+        hx-swap="multi:{% for n in range(10) %}#{{variable}}{{n}},{%endfor%}"
+        {% if value %}value="{{value}}"{%endif%}>
+    <div class="help">{{help |safe}}</div>
+</div>

@@ -2,11 +2,7 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-
-@app.post("/clicked")
-def clicked():
-    return "<b>Clickced!</b>"
-
+## HTMX
 
 @app.get("/public")
 def public():
@@ -37,11 +33,11 @@ def update_input():
                 response += f"<span id='{value}{i}'>{data}</span>"
     return response
 
+## MAIN
+
 @app.get("/")
 def home():
     return render_template("index.html")
-
-
 
 
 if __name__ == "__main__":
