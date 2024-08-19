@@ -99,7 +99,6 @@ def _fix_service_name(service_name):
 
 
 def parse_appjson(data):
-    print("PARSE APPJSON")
     settings = {}
 
     # Parse name
