@@ -171,9 +171,18 @@
       <pre class="shell"><code><li>gcloud run services update <span id="service6">{{service_name}}</span> \
     {{options}}</li></code></pre>
     </div>
-    </p>
-
     {% endif %}
+    {% if service_secrets %}
+    <div class="important">
+      <b>Important</b>: The code you're deploying also came with services (defined in <code>app.json</code>).<br>
+      These need to be defined, then added to your service.
+
+      <pre class="shell"><code><li>gcloud run services update <span id="service6">{{service_name}}</span> \
+    {{service_secrets}}</li></code></pre>
+    </div>
+    {% endif %}
+
+
     <p>
       <span id="public-iam"><b>Optional: </b></span>To make the service public:
     <pre class="shell"><code><li>gcloud run services add-iam-policy-binding <span id="service8">{{service_name}}</span> \

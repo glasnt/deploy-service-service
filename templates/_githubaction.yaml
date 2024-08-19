@@ -24,6 +24,6 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          source: .
+          source: <span id="directory9">{{directory}}</span>
           region: <span id="region9">{{region}}</span>
           service: <span id="service9">{{service_name}}</span>

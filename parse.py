@@ -79,9 +79,9 @@ def _parse_env(env):
 
     _set_envvars, _set_secrets = "", ""
     if len(_service_envs) > 0:
-        _set_envvars = "- --set-env-vars=" + ",".join(_service_envs)
+        _set_envvars = "--set-env-vars=" + ",".join(_service_envs)
     if len(_service_secrets) > 0:
-        _set_secrets = "- --set-secrets=" + ",".join(_service_secrets)
+        _set_secrets = "--set-secrets=" + ",".join(_service_secrets)
 
     return _extra_substitutions, _set_envvars, _set_secrets
 

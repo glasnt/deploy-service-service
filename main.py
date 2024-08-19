@@ -5,7 +5,6 @@ import requests
 
 app = Flask(__name__)
 
-
 ## HTMX
 @app.get("/public")
 def public():
@@ -37,6 +36,7 @@ def update_input():
         "service",
         "repo",
         "branch",
+        "directory",
         "serviceaccount",
         "pool",
         "provider",
