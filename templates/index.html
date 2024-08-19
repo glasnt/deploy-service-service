@@ -78,9 +78,9 @@
 
     </div>
     <div class="question">
-      <label style="display: inline-block">Allow unauthenticated invocations</label>
-      <input type="checkbox" value="true" name="public" hx-get="/public" hx-trigger="change"
-        hx-swap="multi:#public-flag,#public-iam">
+      <label>Allow unauthenticated invocations</label>
+      No <input class="switch" type="checkbox" value="true" role="switch" name="public" hx-get="/public" hx-trigger="change"
+        hx-swap="multi:#public-flag,#public-iam"> Yes
       <div class="help">Do you you want <b>anyone</b> to be able to open your website?</div>
     </div>
     <h3>Optional</h3>
