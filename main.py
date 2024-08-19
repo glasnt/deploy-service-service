@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request
+from repo import parse_repo
+from parse import parse_appjson
 import requests
 
 app = Flask(__name__)
 
 ## HTMX
-
-
 @app.get("/public")
 def public():
     """IAM Code to make a service public."""
@@ -48,30 +48,14 @@ def update_input():
 
 
 ## MAIN
-
-
 def get_context(referer):
-    context = {}
-    clean_referer = referer.split("?")[0].replace("https://github.com/", "")
 
-    # Get information
-    github_repo = "/".join(clean_referer.split("/")[0:2])
-    service_name = clean_referer.split("/")[1].replace("_", "-")
+    context = parse_repo(referer)
+    #breakpoint()
 
-    # Guess information
-    if "tree" in clean_referer or "blob" in clean_referer:
-        branch = clean_referer.split("/")[3]
-    else:
-        try:
-            response = requests.get(f"https://api.github.com/repos/{github_repo}")
-            branch = response.json()["default_branch"]
-        except:
-            branch = ""
 
-    context["github_repo"] = github_repo
-    context["service_name"] = service_name
-    context["branch"] = branch
     context["prefill_message"] = True
+    context["debug"] = context
     return context
 
 
@@ -79,11 +63,14 @@ def get_context(referer):
 def home():
     # Optionally insert information from header
     context = {}
+    """
     if (
         "referer" in request.headers
         and "https://github.com" in request.headers["referer"]
     ):
         context = get_context(request.headers["referer"])
+    """
+    #context = get_context("https://github.com/glasnt/deploy-service-service/tree/latest/tests/options")
 
     return render_template("index.html", **context)
 

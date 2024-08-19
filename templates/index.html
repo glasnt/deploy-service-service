@@ -77,11 +77,23 @@
       include "_question.html" %}{% endwith %}
 
     </div>
+
+    <div class="grid">
+
+    {% with
+      label="Base directory",
+      variable="directory", value=directory,
+      help="Do you want to build from the root directory, or somewhere else?" %}{%
+      include "_question.html" %}{% endwith %}
+
     <div class="question">
       <label>Allow unauthenticated invocations</label>
       No <input class="switch" type="checkbox" value="true" role="switch" name="public" hx-get="/public" hx-trigger="change"
         hx-swap="multi:#public-flag,#public-iam"> Yes
       <div class="help">Do you you want <b>anyone</b> to be able to open your website?</div>
+    </div>
+
+    <div class="question"></div>
     </div>
     <h3>Optional</h3>
     <div class="grid">
