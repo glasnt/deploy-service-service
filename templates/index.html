@@ -51,23 +51,25 @@
       include "_question.html" %}{% endwith %}
 
     </div>
+    {% if prefill_message %}<p class="prefill">✨<i> {{prefill_message}} </i>✨</p>{% endif %}
+
     <div class="grid">
 
       {% with
       label="Service name",
-      variable="service",
+      variable="service", value="service_name",
       help="What should your service be called?" %}{%
       include "_question.html" %}{% endwith %}
 
       {% with
       label="GitHub Repo",
-      variable="repo",
+      variable="repo", value="github_repo",
       help="Use either UserName/Repo or Organisation/Repo (don't include the 'github.com')" %}{%
       include "_question.html" %}{% endwith %}
 
       {% with
       label="Default branch",
-      variable="branch",
+      variable="branch", value="main",
       help="It's probably 'main', 'latest', etc." %}{%
       include "_question.html" %}{% endwith %}
 

@@ -37,7 +37,18 @@ def update_input():
 
 @app.get("/")
 def home():
-    return render_template("index.html")
+    context = {}
+    # Optionally insert information from header
+    if 'referer' in request.headers: # and "https://github.com" in request.headers['referer']:
+        print(f"Referer: {request.headers['referer']}")
+        context['prefill_message'] = "Since you came from GitHub, we're prefilled some of these for you:"
+        context['github_repo'] = "TEST"
+        context['branch'] = "test"
+        context['debug'] = "Request header: " + request.headers['referer']
+    else:
+        print("No referer headers")
+
+    return render_template("index.html", **context)
 
 
 if __name__ == "__main__":
