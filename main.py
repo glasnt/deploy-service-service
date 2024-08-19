@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import requests
 
 app = Flask(__name__)
 
@@ -35,18 +36,36 @@ def update_input():
 
 ## MAIN
 
+def get_context(referer):
+    context = {}
+    clean_referer = referer.split("?")[0].replace("https://github.com/", "")
+
+    # Get information
+    github_repo = "/".join(clean_referer.split("/")[0:2])
+    service_name = clean_referer.split('/')[1].replace("_","-")
+
+    # Guess information
+    if "tree" in clean_referer or "blob" in clean_referer:
+        branch = clean_referer.split("/")[3]
+    else:
+        try:
+            response = requests.get(f"https://api.github.com/repos/{github_repo}")
+            branch = response.json()['default_branch']
+        except:
+            branch = ""
+
+    context['github_repo'] = github_repo
+    context['service_name']= service_name
+    context['branch'] = branch
+    context['prefill_message'] = True
+    return context
+
 @app.get("/")
 def home():
-    context = {}
     # Optionally insert information from header
-    if 'referer' in request.headers: # and "https://github.com" in request.headers['referer']:
-        print(f"Referer: {request.headers['referer']}")
-        context['prefill_message'] = "Since you came from GitHub, we're prefilled some of these for you:"
-        context['github_repo'] = "TEST"
-        context['branch'] = "test"
-        context['debug'] = "Request header: " + request.headers['referer']
-    else:
-        print("No referer headers")
+    context = {}
+    if 'referer' in request.headers and "https://github.com" in request.headers['referer']:
+        context = get_context(request.headers['referer'])
 
     return render_template("index.html", **context)
 

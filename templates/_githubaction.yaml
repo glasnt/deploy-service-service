@@ -19,7 +19,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/<span id="projectnum0">PROJECT_NUM</span>/locations/global/workloadIdentityPools/<span id="pool1">example-pool</span>/providers/<span id="provider1">example-gh-provider</span>
-          service_account: <span id="serviceaccount1">my-service-account</span>@<span id="project7">PROJECT</span>.iam.gserviceaccount.com
+          service_account: <span id="serviceaccount1">my-service-account</span>@<span id="project7">PROJECT_ID</span>.iam.gserviceaccount.com
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2

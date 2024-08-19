@@ -26,6 +26,7 @@
   <p>Don't want to link a repo? <a href="#manual">Go to the manual method.</a></p>
   </p>
   <div id="inputs">
+    {% if debug %}{{debug}}{% endif %}
     <h2>Customisation</h2>
     <div class="grid">
 
@@ -51,25 +52,27 @@
       include "_question.html" %}{% endwith %}
 
     </div>
-    {% if prefill_message %}<p class="prefill">✨<i> {{prefill_message}} </i>✨</p>{% endif %}
+    {% if prefill_message %}<p class="prefill">✨
+        <i>Since you came from GitHub, we're prefilled some of these for you. Feel free to change them.</i>
+    ✨</p>{% endif %}
 
     <div class="grid">
 
       {% with
       label="Service name",
-      variable="service", value="service_name",
+      variable="service", value=service_name,
       help="What should your service be called?" %}{%
       include "_question.html" %}{% endwith %}
 
       {% with
       label="GitHub Repo",
-      variable="repo", value="github_repo",
+      variable="repo", value=github_repo,
       help="Use either UserName/Repo or Organisation/Repo (don't include the 'github.com')" %}{%
       include "_question.html" %}{% endwith %}
 
       {% with
       label="Default branch",
-      variable="branch", value="main",
+      variable="branch", value=branch,
       help="It's probably 'main', 'latest', etc." %}{%
       include "_question.html" %}{% endwith %}
 
@@ -128,7 +131,7 @@
     Execute the code:
     <pre class="shell"><code><li>terraform init</li>
 <li>terraform apply \
-    -var project_id=<span id="project2">PROJECT</span> \
+    -var project_id=<span id="project2">PROJECT_ID</span> \
     -var github_repo=<span id="repo2">GITHUB_REPO</span> \
     -var service_account=<span id="serviceaccount2">my-service-account</span> \
     -var pool_id=<span id="pool2">example-pool</span> \
