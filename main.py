@@ -5,6 +5,7 @@ import requests
 
 app = Flask(__name__)
 
+
 ## HTMX
 @app.get("/public")
 def public():
@@ -62,14 +63,12 @@ def get_context(referer):
 def home():
     # Optionally insert information from header
     context = {}
-    """
+
     if (
         "referer" in request.headers
         and "https://github.com" in request.headers["referer"]
     ):
         context = get_context(request.headers["referer"])
-    """
-    context = get_context("https://github.com/glasnt/deploy-service-service/tree/latest/tests/options")
 
     return render_template("index.html", **context)
 
