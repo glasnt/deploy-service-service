@@ -99,6 +99,7 @@ def _fix_service_name(service_name):
 
 
 def parse_appjson(data):
+    print("PARSE APPJSON")
     settings = {}
 
     # Parse name
@@ -108,11 +109,7 @@ def parse_appjson(data):
         settings["service_name"] = data["_service_name"]
 
     settings["service_name"] = _fix_service_name(settings["service_name"])
-    settings["region"] = data["_region"]
-
-    # Added by parse_repo()
-    if "_directory" in data.keys():
-        settings["context_directory"] = data["_directory"]
+    settings["region"] = "us-central1"
 
     # Parse env
     if "env" in data.keys():
@@ -123,33 +120,6 @@ def parse_appjson(data):
         ) = _parse_env(data["env"])
         settings["extra_substitutions"] = "\n".join(extra_substitutions)
 
-    # Parse build type by file
-    settings["push"] = True
-    if "_dockerfile" in data.keys():
-        settings["build_type"] = "docker"
-
-    if "_pomxml" in data.keys():
-        settings["build_type"] = "jib"
-        settings["push"] = False  # jib automatically pushes, don't need Docker.
-
-    # Parse build if given
-    if "build" in data.keys():
-        if "skip" in data["build"].keys() and data["build"]["skip"] is True:
-            settings["skip_build"] = True
-        if "buildpacks" in data["build"].keys():
-            settings["build_type"] = "buildpacks"
-
-            if "builder" in data["build"]["buildpacks"].keys():
-                settings["buildpacks_builder"] = data["build"]["buildpacks"]["builder"]
-
-    # Default to buildpacks if no expected files found
-    if "build_type" not in settings.keys():
-        settings["build_type"] = "buildpacks"
-
-    # Provide default builder if not already provided.
-    if "build_type" in settings.keys() and settings["build_type"] == "buildpacks" and "buildpacks_builder" not in settings.keys():
-        settings["buildpacks_builder"] = "gcr.io/buildpacks/builder:v1"
-
     # Parse options
     options = {}
     if "options" in data.keys():
@@ -157,7 +127,7 @@ def parse_appjson(data):
 
     if "authentication" not in options.keys():
         options = {"authentication": "--allow-unauthenticated"}
-    settings["options"] = "\n        - ".join(options.values()) #TODO: resilient space padding
+    settings["options"] = "  ".join(options.values()) #TODO: resilient space padding
 
     # Parse hooks
     if "hooks" in data.keys():

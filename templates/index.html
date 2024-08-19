@@ -17,7 +17,8 @@
 <body hx-ext="multi-swap" class="container">
 
   <h1>Deploy Service Service</h1>
-  <p>This page will help you setup the elements to get a GitHub repo containing code for a website deployed to Cloud Run.</p>
+  <p>This page will help you setup the elements to get a GitHub repo containing code for a website deployed to Cloud
+    Run.</p>
   <p>It will use:
     <li><a href="https://docs.github.com/en/actions">GitHub Actions</a>,</li>
     <li><a href="https://cloud.google.com/iam/docs/workload-identity-federation">Workload Identity Federation</a>,</li>
@@ -26,7 +27,6 @@
   <p>Don't want to link a repo? <a href="#manual">Go to the manual method.</a></p>
   </p>
   <div id="inputs">
-    {% if debug %}{{debug}}{% endif %}
     <h2>Customisation</h2>
     <div class="grid">
 
@@ -46,15 +46,16 @@
 
       {% with
       label="Region",
-      variable="region", value="us-central1",
+      variable="region", value=region,
       help="Where do you want to deploy your service? Choose a <a
         href='https://cloud.google.com/run/docs/locations'>Cloud Run location</a>" %}{%
       include "_question.html" %}{% endwith %}
 
     </div>
     {% if prefill_message %}<p class="prefill">✨
-        <i>Since you came from GitHub, we're prefilled some of these for you. Feel free to change them.</i>
-    ✨</p>{% endif %}
+      <i>Since you came from GitHub, we're prefilled some of these for you. Feel free to change them.</i>
+      ✨
+    </p>{% endif %}
 
     <div class="grid">
 
@@ -80,20 +81,20 @@
 
     <div class="grid">
 
-    {% with
+      {% with
       label="Base directory",
       variable="directory", value=directory,
       help="Do you want to build from the root directory, or somewhere else?" %}{%
       include "_question.html" %}{% endwith %}
 
-    <div class="question">
-      <label>Allow unauthenticated invocations</label>
-      No <input class="switch" type="checkbox" value="true" role="switch" name="public" hx-get="/public" hx-trigger="change"
-        hx-swap="multi:#public-flag,#public-iam"> Yes
-      <div class="help">Do you you want <b>anyone</b> to be able to open your website?</div>
-    </div>
+      <div class="question">
+        <label>Allow unauthenticated invocations</label>
+        No <input class="switch" type="checkbox" value="true" role="switch" name="public" hx-get="/public"
+          hx-trigger="change" hx-swap="multi:#public-flag,#public-iam"> Yes
+        <div class="help">Do you you want <b>anyone</b> to be able to open your website?</div>
+      </div>
 
-    <div class="question"></div>
+      <div class="question"></div>
     </div>
     <h3>Optional</h3>
     <div class="grid">
@@ -144,10 +145,10 @@
     <pre class="shell"><code><li>terraform init</li>
 <li>terraform apply \
     -var project_id=<span id="project2">PROJECT_ID</span> \
-    -var github_repo=<span id="repo2">GITHUB_REPO</span> \
-    -var service_account=<span id="serviceaccount2">my-service-account</span> \
-    -var pool_id=<span id="pool2">example-pool</span> \
-    -var provider_id=<span id="provider2">example-gh-provider</span> \
+    -var github_repo=<span id="repo2">{{github_repo}}</span> \
+    -var service_account=<span id="serviceaccount2">gh-account</span> \
+    -var pool_id=<span id="pool2">gh-pool</span> \
+    -var provider_id=<span id="provider2">gh-provider</span> \
 </li>
 </code></pre>
 
@@ -157,29 +158,40 @@
     <h2>Create this GitHub Action</h2>
 
     Add this file to your repo at <code>.github/workflows/deploy.yaml</code>
-    <button id="copyghaction" class="secondary">Copy to clipboard</button><br>
 
-    <textarea id="ghaction">{%include "_githubaction.yaml" %}</textarea>
+    <pre><code>{%include "_githubaction.yaml" %}</code></pre>
 
     <p>Once you commit this file, this action will run and deploy your service.</p>
 
+    {% if options %}
+    <div class="important">
+      <b>Important</b>: The code you're deploying also came with extra settings (defined in <code>app.json</code>).<br>
+      Instead of adding these configs to your GitHub action, you should update your deployed service with these configs.
+
+      <pre class="shell"><code><li>gcloud run services update <span id="service6">{{service_name}}</span> \
+    {{options}}</li></code></pre>
+    </div>
+    </p>
+
+    {% endif %}
     <p>
       <span id="public-iam"><b>Optional: </b></span>To make the service public:
-    <pre class="shell"><code><li>gcloud run services add-iam-policy-binding <span id="service8">SERVICE</span> \
-    --region <span id="region8">REGION</span> \
+    <pre class="shell"><code><li>gcloud run services add-iam-policy-binding <span id="service8">{{service_name}}</span> \
+    --region <span id="region8">{{region}}</span> \
     --member allUsers --role roles/run.invoker</li></code></pre>
     </p>
 
-    Now, any time you push to the <span id="branch2">BRANCH</span> branch, a new version of <span
-      id="service7">SERVICE</span> service will be deployed.
 
+    <p>Now, any time you push to the <span id="branch2">{{branch}}</span> branch, a new version of <span
+        id="service7">{{service_name}}</span> service will be deployed.
+    </p>
     <hr>
     <a name="manual"></a>
     <h1>Alternatively: One-time deployment</h1>
 
     If you have your GitHub repo cloned locally, you can just run this and follow the prompts:
     <pre class="shell"><code><li>cd /path/to/<span id="repo0">repo</span></li>
-<li>gcloud run deploy <span id="service0">SERVICE</span> <span id="public-flag"></span></li></code></pre>
+<li>gcloud run deploy <span id="public-flag"></span></li></code></pre>
 
     <H2>Learn more</H2>
     <p>
@@ -195,12 +207,6 @@
         document.querySelector("#terraform").select();
         document.execCommand('copy');
         document.querySelector("#copyterraform").innerHTML = "Copied!"
-      }
-
-      document.querySelector("#copyghaction").onclick = function () {
-        document.querySelector("#ghaction").select();
-        document.execCommand('copy');
-        document.querySelector("#copyghaction").innerHTML = "Copied!"
       }
 
     </script>

@@ -18,19 +18,19 @@ variable "github_repo" {
 variable "service_account" {
   type        = string
   description = "Service account name"
-  default     = "my-service-account"
+  default     = "gh-account"
 }
 
 variable "pool_id" {
   type        = string
   description = "Workload Identity Pool name"
-  default     = "example-pool"
+  default     = "gh-pool"
 }
 
 variable "provider_id" {
   type        = string
   description = "Workload Identity Provider name"
-  default     = "example-gh-provider"
+  default     = "gh-provider"
 }
 
 # Useful values for later

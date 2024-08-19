@@ -58,3 +58,7 @@ r {
 .switch {
   margin: 30px;
 }
+
+.important {
+  background: rgb(240, 197, 161);
+}

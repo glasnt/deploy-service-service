@@ -51,11 +51,10 @@ def update_input():
 def get_context(referer):
 
     context = parse_repo(referer)
-    #breakpoint()
-
+    settings = context.update(parse_appjson(context))
 
     context["prefill_message"] = True
-    context["debug"] = context
+    context["debug"] = [context, settings]
     return context
 
 
@@ -70,7 +69,7 @@ def home():
     ):
         context = get_context(request.headers["referer"])
     """
-    #context = get_context("https://github.com/glasnt/deploy-service-service/tree/latest/tests/options")
+    context = get_context("https://github.com/glasnt/deploy-service-service/tree/latest/tests/options")
 
     return render_template("index.html", **context)
 

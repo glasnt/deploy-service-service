@@ -42,25 +42,15 @@ def parse_repo(github_url):
     repo, branch, directory = _parse_url(github_url)
 
     appjson = _get_file(repo, branch, Path(directory) / "app.json")
-    dockerfile = _get_file(repo, branch, Path(directory) / "Dockerfile")
-    pomxml = _get_file(repo, branch, Path(directory) / "pom.xml" )
 
     if appjson:
         data = json.loads(appjson)
     else:
         data = {}
 
-    # Give parser additional context
-    if dockerfile:
-        data["_dockerfile"] = True
-
-    if pomxml:
-        data["_pomxml"] = True
-
-
-    data["_directory"] = directory
-    data["_repo"] = repo.full_name
-    data["_branch"] = branch
-    data["_service_name"] = f'{repo.full_name.split("/")[-1]}--{data["_branch"]}--{data["_directory"].replace("/","-")}'
+    data["directory"] = directory
+    data["github_repo"] = repo.full_name
+    data["branch"] = branch
+    data["_service_name"] = f'{repo.full_name.split("/")[-1]}--{data["branch"]}--{data["directory"].replace("/","-")}'
 
     return data

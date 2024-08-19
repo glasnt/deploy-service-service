@@ -3,7 +3,7 @@ name: source_deploy
 on:
   push:
     branches:
-      - <span id="branch1">BRANCH</span>
+      - <span id="branch1">{{branch}}</span>
 
 jobs:
   deploy:
@@ -18,12 +18,12 @@ jobs:
       - id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/<span id="projectnum0">PROJECT_NUM</span>/locations/global/workloadIdentityPools/<span id="pool1">example-pool</span>/providers/<span id="provider1">example-gh-provider</span>
-          service_account: <span id="serviceaccount1">my-service-account</span>@<span id="project7">PROJECT_ID</span>.iam.gserviceaccount.com
+          workload_identity_provider: projects/<span id="projectnum0">PROJECT_NUM</span>/locations/global/workloadIdentityPools/<span id="pool1">gh-pool</span>/providers/<span id="provider1">gh-provider</span>
+          service_account: <span id="serviceaccount1">gh-account</span>@<span id="project7">PROJECT_ID</span>.iam.gserviceaccount.com
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           source: .
-          region: <span id="region9">REGION</span>
-          service: <span id="service9">SERVICE</span>
+          region: <span id="region9">{{region}}</span>
+          service: <span id="service9">{{service_name}}</span>
