@@ -27,6 +27,8 @@ def _parse_url(github_url):
         branch = repo.default_branch
         directory = "."
 
+    # TODO(glasnt): needs to ensure directory is a directory, not a file.
+
     return repo, branch, directory
 
 

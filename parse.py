@@ -102,6 +102,7 @@ def parse_appjson(data):
     # Parse name
     if "name" in data.keys():
         settings["service_name"] = data["name"]
+        # TODO(glasnt): this may not work as expected.
     else:
         settings["service_name"] = data["_service_name"]
 
@@ -116,6 +117,7 @@ def parse_appjson(data):
             settings["service_secrets"],
         ) = _parse_env(data["env"])
         settings["extra_substitutions"] = "\n".join(extra_substitutions)
+    # TODO(glasnt): static envvars may not return in output.
 
     # Parse options
     options = {}
