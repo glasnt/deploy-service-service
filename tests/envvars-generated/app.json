@@ -1,6 +1,10 @@
 {
+  "name": "test-app",
   "env": {
-    "FOO": {
+    "TITLE": {
+      "description": "title for your site"
+    },
+    "APP_SECRET": {
       "generator": "secret"
     }
   }
