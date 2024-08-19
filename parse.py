@@ -17,8 +17,6 @@ def _parse_options(options):
         and options["allow-unauthenticated"] is False
     ):
         _settings["authentication"] = "--no-allow-unauthenticated"
-    else:
-        _settings["authentication"] = "--allow-unauthenticated"
 
     if "http2" in options.keys() and options["http2"] is True:
         _settings["http2"] = "--use-http2"
@@ -66,10 +64,10 @@ def _parse_env(env):
                 substitution += '"' + env[key]["value"] + '"'
             elif "generator" in env[key].keys() and env[key]["generator"] == "secret":
                 substitution += '""  # GENERATOR'
-                warning_text("Value {key} needs secret TODO")
+                warning_text(f"Value {key} needs secret TODO")
             else:
                 substitution += '""'
-                warning_text("Value {key} needs default TODO")
+                warning_text(f"Value {key} needs default TODO")
 
             if "description" in env[key].keys():
                 substitution += f"  # {env[key]['description']}"
@@ -124,9 +122,7 @@ def parse_appjson(data):
     if "options" in data.keys():
         options = _parse_options(data["options"])
 
-    if "authentication" not in options.keys():
-        options = {"authentication": "--allow-unauthenticated"}
-    settings["options"] = "  ".join(options.values()) #TODO: resilient space padding
+    settings["options"] = "  ".join(options.values())
 
     # Parse hooks
     if "hooks" in data.keys():
